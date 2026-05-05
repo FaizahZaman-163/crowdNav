@@ -100,7 +100,7 @@ class _RegisterPageState extends State<RegisterPage> {
     required void Function(String?) onChanged,
   }) {
     return DropdownButtonFormField<String>(
-      value: items.contains(value) ? value : null,
+      initialValue: items.contains(value) ? value : null,
       decoration: InputDecoration(
         labelText: label,
         filled: true,
@@ -170,7 +170,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             controller: _idController,
                             keyboardType: TextInputType.text,
                             label: 'Student ID',
-                            hint: 'e.g. 01823xxxxxxxxxxx',
+                            hint: 'e.g. 018xxxxxxxxxxxxx',
                             icon: Icons.badge_outlined,
                           ),
                           const SizedBox(height: 10),

@@ -21,17 +21,17 @@ class WeatherData {
   String get iconUrl => 'https://openweathermap.org/img/wn/$iconCode@2x.png';
 
   String get commuteTip {
-    if (isRaining) return '🌧️ Rain expected – carry an umbrella!';
-    if (tempC > 34) return '☀️ Extreme heat – stay hydrated!';
-    if (tempC < 18) return '🧥 Cool weather – wear a jacket!';
-    if (windSpeed > 10) return '💨 Windy – hold on to your things!';
+    if (isRaining) return '🌧️ Rain expected - carry an umbrella!';
+    if (tempC > 34) return '☀️ Extreme heat - stay hydrated!';
+    if (tempC < 18) return '🧥 Cool weather - wear a jacket!';
+    if (windSpeed > 10) return '💨 Windy - hold on to your things!';
     return '✅ Weather looks good for commuting!';
   }
 }
 
 class WeatherService {
   
-  static const _apiKey = '46d0ae609409e76de04e042f17926759 '; 
+  static const _apiKey = '46d0ae609409e76de04e042f17926759';
   static const _city = 'Sylhet,BD';
   static const _baseUrl = 'https://api.openweathermap.org/data/2.5/weather';
 

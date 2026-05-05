@@ -5,32 +5,57 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 const _nodes = {
-  'Gate': LatLng(24.8820, 91.8715),
-  'Main Building': LatLng(24.8832, 91.8731),
-  'CSE Dept': LatLng(24.8838, 91.8740),
-  'Library': LatLng(24.8825, 91.8750),
-  'Cafeteria': LatLng(24.8815, 91.8745),
-  'Auditorium': LatLng(24.8842, 91.8722),
-  'Admin Block': LatLng(24.8829, 91.8718),
-  'Bus Stop': LatLng(24.8810, 91.8710),
+  'Gate': LatLng(24.869579299268104, 91.804322188432),
+  'Bus Stop': LatLng(24.86957129217213, 91.80401658649481),
+  'Shahid Minar': LatLng(24.86933759235745, 91.80445629346417),
+  'RKB (Rabeya Khatun Building)': LatLng(24.869686980202665, 91.80477127947175),
+  'RAB (Ragib Ali Building)': LatLng(24.86963488980799, 91.80503921443818),
+  'CSE Dept (RAB 3rd Floor)': LatLng(24.86963488980799, 91.80503921443818),
+  'Library (RAB 2nd Floor)': LatLng(24.86963488980799, 91.80503921443818),
+  'Cafeteria': LatLng(24.86927986130612, 91.80529471029429),
 };
 
 final _edges = <String, Map<String, double>>{
-  'Gate': {'Main Building': 2.0, 'Bus Stop': 1.0, 'Admin Block': 1.5},
-  'Main Building': {
-    'Gate': 2.0,
-    'CSE Dept': 1.2,
-    'Library': 1.8,
-    'Cafeteria': 1.5,
-    'Admin Block': 1.0,
-    'Auditorium': 1.3,
+  'Gate': {
+    'Bus Stop': 1.0,
+    'Shahid Minar': 1.2,
+    'RKB (Rabeya Khatun Building)': 1.5,
   },
-  'CSE Dept': {'Main Building': 1.2, 'Library': 0.8, 'Auditorium': 1.0},
-  'Library': {'CSE Dept': 0.8, 'Main Building': 1.8, 'Cafeteria': 0.9},
-  'Cafeteria': {'Library': 0.9, 'Main Building': 1.5, 'Bus Stop': 1.2},
-  'Auditorium': {'Main Building': 1.3, 'CSE Dept': 1.0, 'Admin Block': 0.7},
-  'Admin Block': {'Gate': 1.5, 'Main Building': 1.0, 'Auditorium': 0.7},
-  'Bus Stop': {'Gate': 1.0, 'Cafeteria': 1.2},
+  'Bus Stop': {
+    'Gate': 1.0,
+    'Shahid Minar': 1.3,
+  },
+  'Shahid Minar': {
+    'Gate': 1.2,
+    'Bus Stop': 1.3,
+    'RKB (Rabeya Khatun Building)': 1.0,
+    'Cafeteria': 1.2,
+  },
+  'RKB (Rabeya Khatun Building)': {
+    'Gate': 1.5,
+    'Shahid Minar': 1.0,
+    'RAB (Ragib Ali Building)': 0.8,
+    'Cafeteria': 1.0,
+  },
+  'RAB (Ragib Ali Building)': {
+    'RKB (Rabeya Khatun Building)': 0.8,
+    'CSE Dept (RAB 3rd Floor)': 0.1,
+    'Library (RAB 2nd Floor)': 0.1,
+    'Cafeteria': 0.9,
+  },
+  'CSE Dept (RAB 3rd Floor)': {
+    'RAB (Ragib Ali Building)': 0.1,
+    'Library (RAB 2nd Floor)': 0.1,
+  },
+  'Library (RAB 2nd Floor)': {
+    'RAB (Ragib Ali Building)': 0.1,
+    'CSE Dept (RAB 3rd Floor)': 0.1,
+  },
+  'Cafeteria': {
+    'Shahid Minar': 1.2,
+    'RKB (Rabeya Khatun Building)': 1.0,
+    'RAB (Ragib Ali Building)': 0.9,
+  },
 };
 
 class _Node {
@@ -89,7 +114,7 @@ class NavigationPage extends StatefulWidget {
 
 class _NavigationPageState extends State<NavigationPage> {
   String _from = 'Gate';
-  String _to = 'CSE Dept';
+  String _to = 'CSE Dept (RAB 3rd Floor)';
   List<String> _path = [];
 
   void _calculateRoute() {
@@ -105,7 +130,6 @@ class _NavigationPageState extends State<NavigationPage> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // TOP BAR (clean modern UI)
         Container(
           padding: const EdgeInsets.all(12),
           color: const Color(0xFFECF0F1),
@@ -144,13 +168,12 @@ class _NavigationPageState extends State<NavigationPage> {
           ),
         ),
 
-        // MAP
         Expanded(
           flex: 3,
           child: FlutterMap(
             options: const MapOptions(
-              initialCenter: LatLng(24.8830, 91.8730),
-              initialZoom: 16,
+              initialCenter: LatLng(24.86950, 91.80470),
+              initialZoom: 18,
             ),
             children: [
               TileLayer(
@@ -284,7 +307,7 @@ class _DropdownNode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      value: _nodes.containsKey(value) ? value : null,
+      initialValue: _nodes.containsKey(value) ? value : null,
       isExpanded: true,
       decoration: InputDecoration(
         labelText: label,
