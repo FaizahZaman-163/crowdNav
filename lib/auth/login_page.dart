@@ -1,0 +1,233 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'register_page.dart';
+import '../pages/home_page.dart';
+import '../widgets/input_field.dart';
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      await Supabase.instance.client.auth.signInWithPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const HomePage()),
+        (route) => false,
+      );
+    } on AuthException catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFECF0F1), // light silver background
+
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+
+            child: Column(
+              children: [
+                // ICON
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2ECC71).withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.directions_bus_rounded,
+                    size: 60,
+                    color: Color(0xFF1E8449),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                Text(
+                  'CrowdNav',
+                  style: GoogleFonts.inter(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF1E8449),
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                const Text(
+                  'Navigate Smart. Stay Safe.',
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 13,
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                
+                Card(
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  color: Colors.white, // ❌ removed pink completely
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+
+                    child: Form(
+                      key: _formKey,
+
+                      child: Column(
+                        children: [
+                          Text(
+                            'Login',
+                            style: GoogleFonts.inter(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF2C3E50),
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          InputField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            label: 'Email',
+                            hint: 'Enter your email',
+                            icon: Icons.email_outlined,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) {
+                                return 'Email is required';
+                              }
+                              if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                                  .hasMatch(v)) {
+                                return 'Enter valid email';
+                              }
+                              return null;
+                            },
+                          ),
+
+                          const SizedBox(height: 14),
+
+                          InputField(
+                            controller: _passwordController,
+                            keyboardType: TextInputType.visiblePassword,
+                            label: 'Password',
+                            hint: 'Enter password',
+                            icon: Icons.lock_outline,
+                            obscureText: true,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) {
+                                return 'Password is required';
+                              }
+                              return null;
+                            },
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: _isLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Color(0xFF2ECC71),
+                                    ),
+                                  )
+                                : ElevatedButton(
+                                    onPressed: _login,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          const Color(0xFF2ECC71),
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Login',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const RegisterPage(),
+                              ),
+                            ),
+                            child: const Text(
+                              "Don't have an account? Register",
+                              style: TextStyle(
+                                color: Color(0xFF1E8449),
+                                fontWeight: FontWeight.w600,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
