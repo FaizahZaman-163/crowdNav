@@ -7,7 +7,9 @@ class UserModel {
   final String department;
   final String program;
   final String bloodGroup;
-  final String role; 
+  final String role;
+  final String? avatarUrl;
+  final String? assignedRoute;
 
   const UserModel({
     required this.id,
@@ -19,6 +21,8 @@ class UserModel {
     required this.program,
     required this.bloodGroup,
     required this.role,
+    this.avatarUrl,
+    this.assignedRoute,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -32,6 +36,8 @@ class UserModel {
       program: map['program'] ?? '',
       bloodGroup: map['blood_group'] ?? '',
       role: map['role'] ?? 'student',
+      avatarUrl: map['avatar_url'],
+      assignedRoute: map['assigned_route'],
     );
   }
 
@@ -45,5 +51,7 @@ class UserModel {
         'program': program,
         'blood_group': bloodGroup,
         'role': role,
+        'avatar_url': avatarUrl,
+        'assigned_route': assignedRoute,
       };
 }

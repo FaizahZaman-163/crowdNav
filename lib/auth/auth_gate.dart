@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'login_page.dart';
+import 'reset_password_page.dart';
 import '../pages/home_page.dart';
 
 class AuthGate extends StatelessWidget {
@@ -13,18 +14,26 @@ class AuthGate extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            backgroundColor: Color(0xFF95537B),
+            backgroundColor: Color(0xFFECF0F1),
             body: Center(
-              child: CircularProgressIndicator(color: Color(0xFFCDE9ED)),
+              child: CircularProgressIndicator(color: Color(0xFF2ECC71)),
             ),
           );
         }
-        final session = snapshot.hasData ? snapshot.data!.session : null;
+
+        final event = snapshot.data?.event;
+        final session = snapshot.data?.session;
+
+        // User opened the app via the password-reset email link
+        if (event == AuthChangeEvent.passwordRecovery) {
+          return const ResetPasswordPage();
+        }
+
         if (session != null) {
           return const HomePage();
-        } else {
-          return const LoginPage();
         }
+
+        return const LoginPage();
       },
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'register_page.dart';
+import 'forgot_password_page.dart';
 import '../pages/home_page.dart';
 import '../widgets/input_field.dart';
 
@@ -26,6 +27,21 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  String _friendlyAuthError(AuthException e) {
+    switch (e.code) {
+      case 'invalid_credentials':
+        return 'Incorrect email or password. Please try again.';
+      case 'over_email_send_rate_limit':
+        return 'Too many attempts. Please wait a few minutes and try again.';
+      case 'email_not_confirmed':
+        return 'Please verify your email before logging in.';
+      case 'user_not_found':
+        return 'No account found with this email. Please register first.';
+      default:
+        return e.message;
+    }
+  }
+
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -46,11 +62,21 @@ class _LoginPageState extends State<LoginPage> {
       );
     } on AuthException catch (e) {
       if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(e.message),
+          content: Text(_friendlyAuthError(e)),
           backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Something went wrong. Please try again.'),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     } finally {
@@ -61,16 +87,13 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFECF0F1), // light silver background
-
+      backgroundColor: const Color(0xFFECF0F1),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
-
             child: Column(
               children: [
-                // ICON
                 Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
@@ -99,27 +122,21 @@ class _LoginPageState extends State<LoginPage> {
 
                 const Text(
                   'Navigate Smart. Stay Safe.',
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 13,
-                  ),
+                  style: TextStyle(color: Colors.black54, fontSize: 13),
                 ),
 
                 const SizedBox(height: 30),
 
-                
                 Card(
                   elevation: 6,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18),
                   ),
-                  color: Colors.white, // ❌ removed pink completely
+                  color: Colors.white,
                   child: Padding(
                     padding: const EdgeInsets.all(24),
-
                     child: Form(
                       key: _formKey,
-
                       child: Column(
                         children: [
                           Text(
@@ -140,12 +157,11 @@ class _LoginPageState extends State<LoginPage> {
                             hint: 'Enter your email',
                             icon: Icons.email_outlined,
                             validator: (v) {
-                              if (v == null || v.isEmpty) {
+                              if (v == null || v.trim().isEmpty) {
                                 return 'Email is required';
                               }
-                              if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
-                                  .hasMatch(v)) {
-                                return 'Enter valid email';
+                              if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v.trim())) {
+                                return 'Enter a valid email address';
                               }
                               return null;
                             },
@@ -164,11 +180,39 @@ class _LoginPageState extends State<LoginPage> {
                               if (v == null || v.isEmpty) {
                                 return 'Password is required';
                               }
+                              if (v.length < 8) {
+                                return 'Password must be at least 8 characters';
+                              }
                               return null;
                             },
                           ),
 
-                          const SizedBox(height: 24),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const ForgotPasswordPage(),
+                                ),
+                              ),
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: const Text(
+                                'Forgot password?',
+                                style: TextStyle(
+                                  color: Color(0xFF1E8449),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
 
                           SizedBox(
                             width: double.infinity,
@@ -182,12 +226,10 @@ class _LoginPageState extends State<LoginPage> {
                                 : ElevatedButton(
                                     onPressed: _login,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          const Color(0xFF2ECC71),
+                                      backgroundColor: const Color(0xFF2ECC71),
                                       foregroundColor: Colors.white,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
                                     ),
                                     child: Text(
